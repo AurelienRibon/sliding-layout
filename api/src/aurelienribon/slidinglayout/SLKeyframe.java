@@ -11,6 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * A keyframe wraps a {@link SLConfig layout configuration} together with
+ * various parameters, such as the ending and starting sides of new and old
+ * components, and the optional delays that can be applied to the components
+ * to create some nice effects.
+ *
  * @author Aurelien Ribon | http://www.aurelienribon.com/
  */
 public class SLKeyframe {
@@ -23,6 +28,12 @@ public class SLKeyframe {
 	private final Map<Component, Float> delays = new HashMap<Component, Float>();
 	private Callback callback;
 
+	/**
+	 * The duration parameter controls the duration of the transition of a
+	 * component from its current place to its target place in the keyframe
+	 * layout configuration. It doesn't account for any optional delay you
+	 * may add to it.
+	 */
 	public SLKeyframe(SLConfig cfg, float duration) {
 		this.cfg = cfg;
 		this.duration = duration;
@@ -33,6 +44,9 @@ public class SLKeyframe {
 		}
 	}
 
+	/**
+	 * A simple callback, yeah.
+	 */
 	public static interface Callback {
 		public void done();
 	}
@@ -41,27 +55,50 @@ public class SLKeyframe {
 	// Public API
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Sets the side of the screen from where the given new components will
+	 * slide from. A new component is a component that is present in this
+	 * layout configuration but not on the previous one.
+	 */
 	public SLKeyframe setStartSide(SLSide side, Component... cmps) {
 		startSides.get(side).addAll(Arrays.asList(cmps));
 		return this;
 	}
 
+	/**
+	 * Sets the side of the screen from where the given old components will
+	 * slide to. An old component is a component that is not present in this
+	 * layout configuration but was on the previous one.
+	 */
 	public SLKeyframe setEndSide(SLSide side, Component... cmps) {
 		endSides.get(side).addAll(Arrays.asList(cmps));
 		return this;
 	}
 
+	/**
+	 * Sets the delay used by the given components before the transition from
+	 * their current place to their target one will fire.
+	 */
 	public SLKeyframe setDelay(float delay, Component... cmps) {
 		for (Component c : cmps) delays.put(c, delay);
 		return this;
 	}
 
+	/**
+	 * Sets the delay used by the given components before the transition from
+	 * their current place to their target one will fire. The delay is
+	 * increased for each component in the list.
+	 */
 	public SLKeyframe setDelayIncr(float delay, Component... cmps) {
 		float d = 0;
 		for (Component c : cmps) delays.put(c, d += delay);
 		return this;
 	}
 
+	/**
+	 * Sets a callback that will be called at the end of the transition to this
+	 * keyframe.s
+	 */
 	public SLKeyframe setCallback(Callback callback) {
 		this.callback = callback;
 		return this;
