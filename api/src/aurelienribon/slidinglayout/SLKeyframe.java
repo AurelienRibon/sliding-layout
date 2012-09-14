@@ -150,6 +150,12 @@ public class SLKeyframe {
 		return endCmps.get(cmp);
 	}
 
+	List<Component> getRemovedCmps() {
+		List<Component> cmps = new ArrayList<Component>();
+		for (SLSide s : SLSide.values()) cmps.addAll(endSides.get(s));
+		return cmps;
+	}
+
 	float getDelay(Component cmp) {
 		return delays.containsKey(cmp) ? delays.get(cmp) : 0;
 	}

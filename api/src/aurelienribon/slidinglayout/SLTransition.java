@@ -112,7 +112,14 @@ public class SLTransition {
 
 		timeline.setCallback(new TweenCallback() {
 			@Override public void onEvent(int type, BaseTween<?> source) {
-				if (kf.getCallback() != null) kf.getCallback().done();
+				for (Component cmp : kf.getRemovedCmps()) {
+					panel.remove(cmp);
+				}
+
+				if (kf.getCallback() != null) {
+					kf.getCallback().done();
+				}
+				
 				if (currentKeyframe < keyframes.size()-1) {
 					currentKeyframe++;
 					play(keyframes.get(currentKeyframe), keyframes.get(currentKeyframe-1));

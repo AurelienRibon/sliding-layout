@@ -4,7 +4,7 @@
 	<!-- Definitions -->
 	<!-- ****************************************************************** -->
 	
-	<property name="version" value="1.0.0" />
+	<property name="version" value="1.0.1" />
 	<property name="api.dir" value="api" />
 	<property name="api.name" value="sliding-layout" />
 	<property name="demo.dir" value="demo" />
