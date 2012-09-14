@@ -13,13 +13,14 @@ import java.util.List;
 /**
  * @author Aurelien Ribon | http://www.aurelienribon.com/
  */
-public class SLTimeline {
+public class SLTransition {
 	private final SLPanel panel;
 	private final TweenManager tweenManager;
 	private final List<SLKeyframe> keyframes = new ArrayList<SLKeyframe>();
 	private int currentKeyframe;
+	private Timeline timeline;
 
-	public SLTimeline(SLPanel panel, TweenManager tweenManager) {
+	public SLTransition(SLPanel panel, TweenManager tweenManager) {
 		this.panel = panel;
 		this.tweenManager = tweenManager;
 	}
@@ -28,12 +29,12 @@ public class SLTimeline {
 	// Public API
 	// -------------------------------------------------------------------------
 
-	public SLTimeline push(SLKeyframe kf) {
+	public SLTransition push(SLKeyframe kf) {
 		keyframes.add(kf);
 		return this;
 	}
 
-	public SLTimeline play() {
+	public SLTransition play() {
 		currentKeyframe = 0;
 		play(keyframes.get(0), new SLKeyframe(panel.currentCfg, 0));
 		return this;
@@ -51,8 +52,9 @@ public class SLTimeline {
 	}
 
 	private void tween(final SLKeyframe kf) {
-		tweenManager.killAll();
-		Timeline tl = Timeline.createParallel();
+		if (timeline != null) timeline.kill();
+
+		timeline = Timeline.createParallel();
 
 		for (Component c : kf.getEndCmps()) {
 			Tile t = kf.getEndTile(c);
@@ -66,24 +68,24 @@ public class SLTimeline {
 			float duration = kf.getDuration();
 
 			if (animXY && animWH) {
-				tl.push(Tween.to(c, SLAnimator.JComponentAccessor.XYWH, duration)
+				timeline.push(Tween.to(c, SLAnimator.JComponentAccessor.XYWH, duration)
 					.target(t.x, t.y, t.w, t.h)
 					.delay(kf.getDelay(c))
 				);
 			} else if (animXY) {
-				tl.push(Tween.to(c, SLAnimator.JComponentAccessor.XY, duration)
+				timeline.push(Tween.to(c, SLAnimator.JComponentAccessor.XY, duration)
 					.target(t.x, t.y)
 					.delay(kf.getDelay(c))
 				);
 			} else if (animWH) {
-				tl.push(Tween.to(c, SLAnimator.JComponentAccessor.WH, duration)
+				timeline.push(Tween.to(c, SLAnimator.JComponentAccessor.WH, duration)
 					.target(t.w, t.h)
 					.delay(kf.getDelay(c))
 				);
 			}
 		}
 
-		tl.setCallback(new TweenCallback() {
+		timeline.setCallback(new TweenCallback() {
 			@Override public void onEvent(int type, BaseTween<?> source) {
 				if (kf.getCallback() != null) kf.getCallback().done();
 				if (currentKeyframe < keyframes.size()-1) {
@@ -93,6 +95,6 @@ public class SLTimeline {
 			}
 		});
 
-		tl.start(tweenManager);
+		timeline.start(tweenManager);
 	}
 }

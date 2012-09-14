@@ -115,7 +115,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p1Action = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(p1Cfg, 0.6f)
 				.setEndSide(SLSide.BOTTOM, p2)
 				.setCallback(new SLKeyframe.Callback() {@Override public void done() {
@@ -128,7 +128,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p1BackAction = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(mainCfg, 0.6f)
 				.setStartSide(SLSide.BOTTOM, p2)
 				.setCallback(new SLKeyframe.Callback() {@Override public void done() {
@@ -141,7 +141,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p2Action = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(p2Cfg, 0.6f)
 				.setEndSide(SLSide.BOTTOM, p4)
 				.setDelay(0.6f, p2)
@@ -155,7 +155,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p2BackAction = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(mainCfg, 0.6f)
 				.setStartSide(SLSide.BOTTOM, p4)
 				.setDelay(0.6f, p4)
@@ -169,7 +169,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p3Action = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(p3Cfg, 0.8f)
 				.setEndSide(SLSide.LEFT, p1, p2)
 				.setEndSide(SLSide.BOTTOM, p4)
@@ -183,7 +183,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p3BackAction = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(mainCfg, 0.8f)
 				.setStartSide(SLSide.LEFT, p1, p2)
 				.setStartSide(SLSide.BOTTOM, p4)
@@ -197,7 +197,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p4Action = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(p4Cfg, 0.6f)
 				.setEndSide(SLSide.RIGHT, p5)
 				.setCallback(new SLKeyframe.Callback() {@Override public void done() {
@@ -210,7 +210,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p4BackAction = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(mainCfg, 0.6f)
 				.setStartSide(SLSide.RIGHT, p5)
 				.setCallback(new SLKeyframe.Callback() {@Override public void done() {
@@ -223,7 +223,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p5Action = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(p5Cfg, 0.8f)
 				.setEndSide(SLSide.LEFT, p1, p2, p3, p4)
 				.setCallback(new SLKeyframe.Callback() {@Override public void done() {
@@ -236,7 +236,7 @@ public class TheFrame extends JFrame {
 	private final Runnable p5BackAction = new Runnable() {@Override public void run() {
 		disableActions();
 
-		panel.createTimeline()
+		panel.createTransition()
 			.push(new SLKeyframe(mainCfg, 0.8f)
 				.setStartSide(SLSide.LEFT, p1, p2, p3, p4)
 				.setCallback(new SLKeyframe.Callback() {@Override public void done() {
