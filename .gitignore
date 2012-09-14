@@ -5,6 +5,7 @@
 /api/tmp/*
 /api/manifest.mf
 /api/nbbuild.xml
+/api/*.jar
 
 /demo/bin/*
 /demo/build/*
@@ -13,6 +14,7 @@
 /demo/tmp/*
 /demo/manifest.mf
 /demo/nbbuild.xml
+/demo/*.jar
 
 /*.jar
 /*.tmp

@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -34,12 +33,12 @@ public class ThePanel extends JPanel {
 	private BufferedImage bgImg;
 	private Runnable action;
 	private boolean actionEnabled = true;
+	private boolean hover = false;
 	private int borderThickness = 2;
 
 	public ThePanel(String name, String imgPath) {
 		setBackground(BG_COLOR);
 		setLayout(new BorderLayout());
-		addMouseListener(mouseListener);
 
 		label.setForeground(FG_COLOR);
 		label.setFont(new Font("Sans", Font.BOLD, 90));
@@ -53,18 +52,43 @@ public class ThePanel extends JPanel {
 			System.err.println("[error] cannot read image path '" + imgPath + "'");
 			add(label, BorderLayout.CENTER);
 		}
+
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				hover = true;
+				if (actionEnabled) showBorder();
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				hover = false;
+				hideBorder();
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (action != null && actionEnabled) action.run();
+			}
+		});
 	}
 
 	public void setAction(Runnable action) {this.action = action;}
-	public void enableAction() {actionEnabled = true;}
+	public void enableAction() {actionEnabled = true; if (hover) showBorder();}
 	public void disableAction() {actionEnabled = false;}
 
-	@Override
-	public void paint(Graphics g) {
-		Graphics2D gg = (Graphics2D) g;
-		// That's for the label
-		gg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		super.paint(gg);
+	private void showBorder() {
+		tweenManager.killTarget(borderThickness);
+		Tween.to(ThePanel.this, Accessor.BORDER_THICKNESS, 0.4f)
+			.target(10)
+			.start(tweenManager);
+	}
+
+	private void hideBorder() {
+		tweenManager.killTarget(borderThickness);
+		Tween.to(ThePanel.this, Accessor.BORDER_THICKNESS, 0.4f)
+			.target(2)
+			.start(tweenManager);
 	}
 
 	@Override
@@ -98,28 +122,6 @@ public class ThePanel extends JPanel {
 		gg.fillRect(0, h-1-t, w-1, t);
 		gg.fillRect(w-1-t, 0, t, h-1);
 	}
-
-	public final MouseListener mouseListener = new MouseAdapter() {
-		@Override public void mouseEntered(MouseEvent e) {
-			if (actionEnabled) {
-				tweenManager.killTarget(borderThickness);
-				Tween.to(ThePanel.this, Accessor.BORDER_THICKNESS, 0.4f)
-					.target(10)
-					.start(tweenManager);
-			}
-		}
-
-		@Override public void mouseExited(MouseEvent e) {
-			tweenManager.killTarget(borderThickness);
-			Tween.to(ThePanel.this, Accessor.BORDER_THICKNESS, 0.4f)
-				.target(2)
-				.start(tweenManager);
-		}
-
-		@Override public void mouseReleased(MouseEvent e) {
-			if (action != null && actionEnabled) action.run();
-		}
-	};
 
 	// -------------------------------------------------------------------------
 	// Tween Accessor

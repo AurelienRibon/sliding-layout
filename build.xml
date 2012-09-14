@@ -1,0 +1,92 @@
+<project name="sliding-layout" default="all" basedir=".">
+
+	<!-- ****************************************************************** -->
+	<!-- Definitions -->
+	<!-- ****************************************************************** -->
+	
+	<property name="version" value="1.0.0" />
+	<property name="api.dir" value="api" />
+	<property name="api.name" value="sliding-layout" />
+	<property name="demo.dir" value="demo" />
+	<property name="demo.name" value="sliding-layout-demo" />
+	<property name="demo.main" value="aurelienribon.slidinglayout.demo.Main" />
+
+	<!-- ****************************************************************** -->
+	<!-- Build tasks -->
+	<!-- ****************************************************************** -->
+	
+	<!-- clean -->	
+	<target name="clean">
+		<delete includeEmptyDirs="true"><fileset dir="${api.dir}" includes="bin/, build/, dist/"/></delete>
+		<delete includeEmptyDirs="true"><fileset dir="${demo.dir}" includes="bin/, build/, dist/"/></delete>
+	</target>
+
+	<!-- init -->
+	<target name="init" depends="clean">
+		<mkdir dir="${api.dir}/bin/" />
+		<mkdir dir="${demo.dir}/bin/" />
+	</target>
+
+	<!-- compile -->
+	<target name="compile" depends="init">
+		<javac target="1.6" source="1.6" debug="on" srcdir="${api.dir}/src/" destdir="${api.dir}/bin/">
+			<classpath>
+				<fileset file="${api.dir}/libs/*.jar" />
+			</classpath>
+		</javac>
+		<javac target="1.6" source="1.6" debug="on" srcdir="${demo.dir}/src/" destdir="${demo.dir}/bin/">
+			<classpath>
+				<pathelement location="${api.dir}/bin/" />
+				<fileset file="${demo.dir}/libs/*.jar" />
+			</classpath>
+		</javac>	
+	</target>
+	
+	<!-- jar -->
+	<target name="jar" depends="compile">
+		<!-- api -->
+		<jar destfile="${api.dir}/${api.name}.jar" basedir="${api.dir}/bin" />
+		<jar destfile="${api.dir}/${api.name}-sources.jar" basedir="${api.dir}/src" />
+		
+		<!-- demo -->
+		<copy file="${api.dir}/${api.name}.jar" todir="${demo.dir}/libs" />
+		<pathconvert property="tests.classpath" pathsep=" ">
+			<path><fileset dir="${demo.dir}" includes="libs/**/*.jar" excludes="libs/**/*-sources.jar" /></path>
+			<chainedmapper><flattenmapper /><globmapper from="*" to="libs/*" /></chainedmapper>
+		</pathconvert>
+		<delete file="${demo.dir}/libs/${api.name}.jar"/>
+		<jar destfile="${demo.dir}/${demo.name}.jar" basedir="${demo.dir}/bin">
+			<manifest>
+				<attribute name="Main-Class" value="${demo.main}"/>
+				<attribute name="Class-Path" value="${tests.classpath}" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<!-- bundle -->
+	<target name="bundle" depends="jar">
+        <jar destfile="${demo.dir}/${demo.name}-tmp.jar" filesetmanifest="skip">
+            <zipgroupfileset dir="${demo.dir}" includes="${demo.name}.jar"/>
+            <zipgroupfileset dir="${demo.dir}/libs/" includes="*.jar" excludes="*-sources.jar"/>
+            <zipgroupfileset dir="${api.dir}" includes="*.jar" excludes="*-sources.jar"/>
+            <manifest><attribute name="Main-Class" value="${demo.main}"/></manifest>
+        </jar>
+
+        <zip destfile="${demo.dir}/${demo.name}.jar">
+            <zipfileset src="${demo.dir}/${demo.name}-tmp.jar" excludes="META-INF/*.txt, META-INF/maven/"/>
+        </zip>
+
+        <delete file="${demo.dir}/${demo.name}-tmp.jar"/>
+    </target>
+	
+	<!-- all -->
+	<target name="all" depends="bundle">
+		<antcall target="clean"/>
+	</target>
+
+	<!-- zip -->
+	<target name="zip" depends="bundle">
+		<zip destfile="${api.name}-${version}.zip" basedir="${api.dir}" includes="*.jar"/>
+		<zip destfile="${demo.name}-${version}.zip" basedir="${demo.dir}" includes="*.jar, data/"/>
+	</target>
+</project>
