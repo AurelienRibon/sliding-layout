@@ -11,6 +11,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A transition consists of one or more keyframes (ie. configurations). The
+ * engine will move the children of the panel from the current configuration to
+ * the first keyframe, and so on.
+ * <p/>
+ *
+ * If a component is present on a keyframe but absent from the current
+ * configuration, it will be considered to be a <b>new component</b>. If you
+ * don't specify anything, it will appear right at its target place, which may
+ * not be very nice. Instead, you can set its starting side, the side from
+ * where it should be brought into view to its target place. It will then slide
+ * from this side to its target place.
+ * <p/>
+ *
+ * Similarly, if a component is present in the current configuration but absent
+ * from the next keyframe, it will be considered to be an <b>old component</b>.
+ * You can slide it out of the screen gracefully by specifying its ending side.
+ *
+ * @see SLConfig
+ * @see SLKeyframe
  * @author Aurelien Ribon | http://www.aurelienribon.com/
  */
 public class SLTransition {
@@ -29,11 +48,17 @@ public class SLTransition {
 	// Public API
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Adds a new keyframe to the transition.
+	 */
 	public SLTransition push(SLKeyframe kf) {
 		keyframes.add(kf);
 		return this;
 	}
 
+	/**
+	 * Starts the transition.
+	 */
 	public SLTransition play() {
 		currentKeyframe = 0;
 		play(keyframes.get(0), new SLKeyframe(panel.currentCfg, 0));
