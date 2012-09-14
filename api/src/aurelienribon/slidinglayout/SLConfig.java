@@ -7,6 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A configuration lets you easily layout the children of a {@link SLPanel}.
+ * Its root is a grid, which can have any number of columns and rows. In each
+ * col/row pair, you can either place a component, or create a sub-grid. This
+ * sub-grid works the same as the first. This powerful layout lets you quickly
+ * build great UIs. Gaps between components are customizable, and colums and
+ * rows can be either fixed or flexible.
+ *
  * @author Aurelien Ribon | http://www.aurelienribon.com/
  */
 public class SLConfig {
@@ -23,12 +30,22 @@ public class SLConfig {
 	// Public API
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Sets the global horizontal and vertical gaps between components, in
+	 * pixels. Default to 0 for both.
+	 */
 	public SLConfig gap(int hgap, int vgap) {
 		this.hgap = hgap;
 		this.vgap = vgap;
 		return this;
 	}
 
+	/**
+	 * Adds a flexible column to the current grid that will resize according
+	 * to the application resize events. The relative width that has to be given
+	 * controls how large the column should be compared to the other flexible
+	 * columns. Give it "1f" to have every flexible column the same width.
+	 */
 	public SLConfig col(float relativeWidth) {
 		Column column = new Column();
 		column.fixedWidth = false;
@@ -38,6 +55,9 @@ public class SLConfig {
 		return this;
 	}
 
+	/**
+	 * Adds a column with a fixed width, in pixels.
+	 */
 	public SLConfig col(int width) {
 		Column column = new Column();
 		column.fixedWidth = true;
@@ -47,6 +67,12 @@ public class SLConfig {
 		return this;
 	}
 
+	/**
+	 * Adds a flexible row to the current grid that will resize according
+	 * to the application resize events. The relative height that has to be
+	 * given controls how large the row should be compared to the other
+	 * flexible rows. Give it "1f" to have every flexible row the same height.
+	 */
 	public SLConfig row(float relativeHeight) {
 		Row row = new Row();
 		row.fixedHeight = false;
@@ -56,6 +82,9 @@ public class SLConfig {
 		return this;
 	}
 
+	/**
+	 * Adds a row with a fixed height, in pixels.
+	 */
 	public SLConfig row(int height) {
 		Row row = new Row();
 		row.fixedHeight = true;
@@ -65,6 +94,9 @@ public class SLConfig {
 		return this;
 	}
 
+	/**
+	 * Places a sub-grid in the specified region of the current grid.
+	 */
 	public SLConfig beginGrid(int row, int col) {
 		Grid grid = new Grid();
 		grid.parent = currentGrid;
@@ -75,12 +107,18 @@ public class SLConfig {
 		return this;
 	}
 
+	/**
+	 * Ends the current grid, and returns to its parent.
+	 */
 	public SLConfig endGrid() {
 		currentGrid = currentGrid.parent;
 		return this;
 	}
 
-	public SLConfig tile(int row, int col, Component cmp) {
+	/**
+	 * Places a component in the specified region of the current grid.
+	 */
+	public SLConfig place(int row, int col, Component cmp) {
 		Tile tile = new Tile();
 		tile.parent = currentGrid;
 		tile.row = row;

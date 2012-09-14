@@ -38,26 +38,26 @@ public class TheFrame extends JFrame {
 			.row(1f).col(250).col(1f).col(2f)
 			.beginGrid(0, 0)
 				.row(2f).row(1f).col(1f)
-				.tile(0, 0, p1)
-				.tile(1, 0, p2)
+				.place(0, 0, p1)
+				.place(1, 0, p2)
 			.endGrid()
 			.beginGrid(0, 1)
 				.row(1f).row(2f).col(1f)
-				.tile(0, 0, p3)
-				.tile(1, 0, p4)
+				.place(0, 0, p3)
+				.place(1, 0, p4)
 			.endGrid()
-			.tile(0, 2, p5);
+			.place(0, 2, p5);
 
 		p1Cfg = new SLConfig(panel)
 			.gap(10, 10)
 			.row(1f).col(250).col(1f).col(2f)
-			.tile(0, 0, p1)
+			.place(0, 0, p1)
 			.beginGrid(0, 1)
 				.row(1f).row(2f).col(1f)
-				.tile(0, 0, p3)
-				.tile(1, 0, p4)
+				.place(0, 0, p3)
+				.place(1, 0, p4)
 			.endGrid()
-			.tile(0, 2, p5);
+			.place(0, 2, p5);
 
 		p2Cfg = new SLConfig(panel)
 			.gap(10, 10)
@@ -66,31 +66,31 @@ public class TheFrame extends JFrame {
 				.row(2f).row(1f).col(1f)
 				.beginGrid(0, 0)
 					.row(1f).col(250).col(1f)
-					.tile(0, 0, p1)
-					.tile(0, 1, p3)
+					.place(0, 0, p1)
+					.place(0, 1, p3)
 				.endGrid()
-				.tile(1, 0, p2)
+				.place(1, 0, p2)
 			.endGrid()
-			.tile(0, 1, p5);
+			.place(0, 1, p5);
 
 		p3Cfg = new SLConfig(panel)
 			.gap(10, 10)
 			.row(1f).col(2f).col(1f)
-			.tile(0, 0, p3)
-			.tile(0, 1, p5);
+			.place(0, 0, p3)
+			.place(0, 1, p5);
 
 		p4Cfg = new SLConfig(panel)
 			.gap(10, 10)
 			.row(1f).row(1f).col(1f).col(1f)
-			.tile(0, 0, p1)
-			.tile(1, 0, p2)
-			.tile(0, 1, p3)
-			.tile(1, 1, p4);
+			.place(0, 0, p1)
+			.place(1, 0, p2)
+			.place(0, 1, p3)
+			.place(1, 1, p4);
 
 		p5Cfg = new SLConfig(panel)
 			.gap(10, 10)
 			.row(1f).col(1f)
-			.tile(0, 0, p5);
+			.place(0, 0, p5);
 
 		panel.setTweenManager(SLAnimator.createTweenManager());
 		panel.initialize(mainCfg);
