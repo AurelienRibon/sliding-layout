@@ -5,6 +5,10 @@ The layouts are based on a grid, which can nest sub-grids and provides fixed/fle
 
 The library is **fully documented** (javadoc everywhere) to get you started quickly.
 
+**Note:**
+*The library uses the [Universal Tween Engine](http://www.aurelienribon.com/blog/projects/universal-tween-engine/)
+under the hood, so you need to have this library in your classpath. It is compatible with the revision 6.3.3.*
+
 ## Examples
 
 The following animated gif features an example of what can be done with the library. 
