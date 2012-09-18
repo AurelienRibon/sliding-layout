@@ -71,7 +71,6 @@ public class SLTransition {
 
 	private void play(SLKeyframe kf, SLKeyframe previousKf) {
 		panel.currentCfg = kf.getCfg();
-
 		kf.initialize(previousKf);
 		tween(kf);
 	}
@@ -81,8 +80,8 @@ public class SLTransition {
 
 		timeline = Timeline.createParallel();
 
-		for (Component c : kf.getEndCmps()) {
-			Tile t = kf.getEndTile(c);
+		for (Component c : kf.getCmps()) {
+			Tile t = kf.getTarget(c);
 
 			int dx = c.getX() - t.x;
 			int dy = c.getY() - t.y;
@@ -112,14 +111,16 @@ public class SLTransition {
 
 		timeline.setCallback(new TweenCallback() {
 			@Override public void onEvent(int type, BaseTween<?> source) {
-				for (Component cmp : kf.getRemovedCmps()) {
-					panel.remove(cmp);
+				for (Component c : kf.getCmpsToAddAfterTransition()) {
+					panel.add(c, new Integer(1));
 				}
 
-				if (kf.getCallback() != null) {
-					kf.getCallback().done();
+				for (Component c : kf.getCmpsToRemoveAfterTransition()) {
+					panel.remove(c);
 				}
-				
+
+				if (kf.getCallback() != null) kf.getCallback().done();
+
 				if (currentKeyframe < keyframes.size()-1) {
 					currentKeyframe++;
 					play(keyframes.get(currentKeyframe), keyframes.get(currentKeyframe-1));

@@ -21,11 +21,12 @@ import java.util.Set;
 public class SLKeyframe {
 	private final SLConfig cfg;
 	private final float duration;
-	private final Map<SLSide, List<Component>> startSides = new EnumMap<SLSide, List<Component>>(SLSide.class);
-	private final Map<SLSide, List<Component>> endSides = new EnumMap<SLSide, List<Component>>(SLSide.class);
-	private final Map<Component, Tile> startCmps = new HashMap<Component, Tile>();
-	private final Map<Component, Tile> endCmps = new HashMap<Component, Tile>();
+	private final Map<SLSide, List<Component>> cmpsWithStartSide = new EnumMap<SLSide, List<Component>>(SLSide.class);
+	private final Map<SLSide, List<Component>> cmpsWithEndSide = new EnumMap<SLSide, List<Component>>(SLSide.class);
+	private final Map<Component, Tile> targetTiles = new HashMap<Component, Tile>();
 	private final Map<Component, Float> delays = new HashMap<Component, Float>();
+	private final List<Component> cmpsToAddAfterTransition = new ArrayList<Component>();
+	private final List<Component> cmpsToRemoveAfterTransition = new ArrayList<Component>();
 	private Callback callback;
 
 	/**
@@ -39,8 +40,8 @@ public class SLKeyframe {
 		this.duration = duration;
 
 		for (SLSide s : SLSide.values()) {
-			startSides.put(s, new ArrayList<Component>());
-			endSides.put(s, new ArrayList<Component>());
+			cmpsWithStartSide.put(s, new ArrayList<Component>());
+			cmpsWithEndSide.put(s, new ArrayList<Component>());
 		}
 	}
 
@@ -61,7 +62,7 @@ public class SLKeyframe {
 	 * layout configuration but not on the previous one.
 	 */
 	public SLKeyframe setStartSide(SLSide side, Component... cmps) {
-		startSides.get(side).addAll(Arrays.asList(cmps));
+		cmpsWithStartSide.get(side).addAll(Arrays.asList(cmps));
 		return this;
 	}
 
@@ -71,7 +72,7 @@ public class SLKeyframe {
 	 * layout configuration but was on the previous one.
 	 */
 	public SLKeyframe setEndSide(SLSide side, Component... cmps) {
-		endSides.get(side).addAll(Arrays.asList(cmps));
+		cmpsWithEndSide.get(side).addAll(Arrays.asList(cmps));
 		return this;
 	}
 
@@ -111,49 +112,84 @@ public class SLKeyframe {
 	void initialize(SLKeyframe prevKf) {
 		cfg.placeAndRoute();
 
-		for (Component c : prevKf.cfg.getCmps()) startCmps.put(c, prevKf.cfg.getTile(c).clone());
-		for (Component c : cfg.getCmps()) endCmps.put(c, cfg.getTile(c).clone());
+		// Only needed for new components
+		Map<Component, Tile> startTiles = new HashMap<Component, Tile>();
 
-		List<Component> addedCmps = new ArrayList<Component>(cfg.getCmps());
-		addedCmps.removeAll(prevKf.cfg.getCmps());
-		List<Tile> addedTiles = new ArrayList<Tile>();
-		for (Component c : addedCmps) addedTiles.add(cfg.getTile(c).clone());
-		for (int i=0; i<addedCmps.size(); i++) startCmps.put(addedCmps.get(i), addedTiles.get(i));
-
-		List<Component> removedCmps = new ArrayList<Component>(prevKf.cfg.getCmps());
-		removedCmps.removeAll(cfg.getCmps());
-		List<Tile> removedTiles = new ArrayList<Tile>();
-		for (Component c : removedCmps) removedTiles.add(prevKf.cfg.getTile(c).clone());
-		for (int i=0; i<removedCmps.size(); i++) endCmps.put(removedCmps.get(i), removedTiles.get(i));
-
-		for (SLSide s : SLSide.values()) {
-			hideTiles(getTiles(startSides.get(s), startCmps), s);
-			hideTiles(getTiles(endSides.get(s), endCmps), s);
+		// Targets are created for every component of this keyframe
+		for (Component c : cfg.getCmps()) {
+			targetTiles.put(c, cfg.getTile(c).clone());
 		}
 
-		for (Component c : startCmps.keySet()) {
-			Tile t = startCmps.get(c);
+		// New components are searched
+		List<Component> newCmps = new ArrayList<Component>();
+		newCmps.addAll(cfg.getCmps());
+		newCmps.removeAll(prevKf.cfg.getCmps());
+
+		// If they have a start side, they are added to the panel and
+		// their location will be computed later. Else, they are directly
+		// placed at their target position, and will be added to the panel
+		// at the end of the transition.
+		for (Component c : newCmps) {
+			if (isPartOf(c, cmpsWithStartSide)) {
+				cfg.getPanel().add(c, new Integer(1));
+				startTiles.put(c, cfg.getTile(c).clone());
+			} else {
+				cmpsToAddAfterTransition.add(c);
+				Tile t = cfg.getTile(c);
+				c.setBounds(t.x, t.y, t.w, t.h);
+			}
+		}
+
+		// Old components are searched
+		List<Component> oldCmps = new ArrayList<Component>();
+		oldCmps.addAll(prevKf.cfg.getCmps());
+		oldCmps.removeAll(cfg.getCmps());
+
+		// If they have an end side, their target location will be computed
+		// later, and they will be removed at the end of the transition. Else,
+		// they are directly removed from the panel.
+		for (Component c : oldCmps) {
+			if (isPartOf(c, cmpsWithEndSide)) {
+				cmpsToRemoveAfterTransition.add(c);
+				targetTiles.put(c, prevKf.cfg.getTile(c).clone());
+			} else {
+				cfg.getPanel().remove(c);
+			}
+		}
+
+
+		// Start/target locations are computed for new/old components
+		// that have a start/end side set.
+		for (SLSide s : SLSide.values()) {
+			hideTiles(getTiles(cmpsWithStartSide.get(s), startTiles), s);
+			hideTiles(getTiles(cmpsWithEndSide.get(s), targetTiles), s);
+		}
+
+		// New components with a start side are then placed at the location
+		// computed above.
+		for (Component c : startTiles.keySet()) {
+			Tile t = startTiles.get(c);
 			c.setBounds(t.x, t.y, t.w, t.h);
 		}
 
-		cfg.getPanel().removeAll();
-		for (Component c : endCmps.keySet()) {
-			cfg.getPanel().add(c, new Integer(1));
-		}
+		// Since some components may have been removed, the panel is repaint.
+		cfg.getPanel().repaint();
 	}
 
-	Set<Component> getEndCmps() {
-		return endCmps.keySet();
+	Set<Component> getCmps() {
+		return targetTiles.keySet();
 	}
 
-	Tile getEndTile(Component cmp) {
-		return endCmps.get(cmp);
+	List<Component> getCmpsToAddAfterTransition() {
+		return cmpsToAddAfterTransition;
 	}
 
-	List<Component> getRemovedCmps() {
-		List<Component> cmps = new ArrayList<Component>();
-		for (SLSide s : SLSide.values()) cmps.addAll(endSides.get(s));
-		return cmps;
+	List<Component> getCmpsToRemoveAfterTransition() {
+		return cmpsToRemoveAfterTransition;
+	}
+
+	Tile getTarget(Component cmp) {
+		return targetTiles.get(cmp);
 	}
 
 	float getDelay(Component cmp) {
@@ -175,6 +211,12 @@ public class SLKeyframe {
 	// -------------------------------------------------------------------------
 	// Private API
 	// -------------------------------------------------------------------------
+
+	private boolean isPartOf(Component c, Map<SLSide, List<Component>> map) {
+		for (SLSide s : SLSide.values())
+			if (map.get(s).contains(c)) return true;
+		return false;
+	}
 
 	private List<Tile> getTiles(List<Component> cmps, Map<Component, Tile> cmpsMap) {
 		List<Tile> tiles = new ArrayList<Tile>();
