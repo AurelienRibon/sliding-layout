@@ -1,6 +1,6 @@
 # SlidingLayout
 
-This little library lets you very easily create **smooth transitions** between two layouts of components in special panel.
+This little library lets you very easily create **smooth transitions** between two layouts of components in a special panel.
 The layouts are based on a grid, which can nest sub-grids and provides fixed/flexible columns and rows.
 
 The library is **fully documented** (javadoc everywhere) to get you started quickly.
@@ -11,11 +11,12 @@ under the hood, so you need to have this library in your classpath. It is compat
 
 ## Examples
 
-The following animated gif features an example of what can be done with the library. 
-There is also a [Youtube video](https://www.youtube.com/watch?v=R6rkcLAjTmA&feature=player_embedded) with images.
-The source code of these examples if available in the **demo** folder of this project.
+The following animated gif features an example of what can be done with the library.
 
 ![](http://www.aurelienribon.com/blog/wp-content/uploads/2012/09/sliding-layout-demo.gif)
+
+There is also a [Youtube video](https://www.youtube.com/watch?v=R6rkcLAjTmA&feature=player_embedded) featuring the same demo with images.
+The source code of these examples is available in the **demo folder** of this project.
 
 ## Help
 
