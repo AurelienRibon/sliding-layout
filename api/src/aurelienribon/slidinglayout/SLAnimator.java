@@ -3,6 +3,7 @@ package aurelienribon.slidinglayout;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenAccessor;
 import aurelienribon.tweenengine.TweenManager;
+import java.awt.Component;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public class SLAnimator {
 	private static boolean running = false;
 
 	static {
-		Tween.registerAccessor(JComponent.class, new JComponentAccessor());
+		Tween.registerAccessor(JComponent.class, new ComponentAccessor());
 		Tween.setCombinedAttributesLimit(4);
 	}
 
@@ -68,7 +69,7 @@ public class SLAnimator {
 	// Accessors
 	// -------------------------------------------------------------------------
 
-	public static class JComponentAccessor implements TweenAccessor<JComponent> {
+	public static class ComponentAccessor implements TweenAccessor<Component> {
 		public static final int X = 1;
 		public static final int Y = 2;
 		public static final int XY = 3;
@@ -78,7 +79,7 @@ public class SLAnimator {
 		public static final int XYWH = 7;
 
 		@Override
-		public int getValues(JComponent target, int tweenType, float[] returnValues) {
+		public int getValues(Component target, int tweenType, float[] returnValues) {
 			switch (tweenType) {
 				case X:
 					returnValues[0] = target.getX();
@@ -111,7 +112,7 @@ public class SLAnimator {
 		}
 
 		@Override
-		public void setValues(JComponent target, int tweenType, float[] newValues) {
+		public void setValues(Component target, int tweenType, float[] newValues) {
 			switch (tweenType) {
 				case X:
 					target.setLocation(Math.round(newValues[0]), target.getY());
@@ -124,19 +125,19 @@ public class SLAnimator {
 					break;
 				case W:
 					target.setSize(Math.round(newValues[0]), target.getHeight());
-					target.revalidate();
+					target.validate();
 					break;
 				case H:
 					target.setSize(target.getWidth(), Math.round(newValues[0]));
-					target.revalidate();
+					target.validate();
 					break;
 				case WH:
 					target.setSize(Math.round(newValues[0]), Math.round(newValues[1]));
-					target.revalidate();
+					target.validate();
 					break;
 				case XYWH:
 					target.setBounds(Math.round(newValues[0]), Math.round(newValues[1]), Math.round(newValues[2]), Math.round(newValues[3]));
-					target.revalidate();
+					target.validate();
 					break;
 			}
 		}

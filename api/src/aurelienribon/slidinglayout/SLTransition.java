@@ -92,17 +92,17 @@ public class SLTransition {
 			float duration = kf.getDuration();
 
 			if (animXY && animWH) {
-				timeline.push(Tween.to(c, SLAnimator.JComponentAccessor.XYWH, duration)
+				timeline.push(Tween.to(c, SLAnimator.ComponentAccessor.XYWH, duration)
 					.target(t.x, t.y, t.w, t.h)
 					.delay(kf.getDelay(c))
 				);
 			} else if (animXY) {
-				timeline.push(Tween.to(c, SLAnimator.JComponentAccessor.XY, duration)
+				timeline.push(Tween.to(c, SLAnimator.ComponentAccessor.XY, duration)
 					.target(t.x, t.y)
 					.delay(kf.getDelay(c))
 				);
 			} else if (animWH) {
-				timeline.push(Tween.to(c, SLAnimator.JComponentAccessor.WH, duration)
+				timeline.push(Tween.to(c, SLAnimator.ComponentAccessor.WH, duration)
 					.target(t.w, t.h)
 					.delay(kf.getDelay(c))
 				);

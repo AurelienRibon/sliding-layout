@@ -5,6 +5,7 @@ import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -14,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -126,11 +126,11 @@ public class ThePanel extends JPanel {
 	// Tween Accessor
 	// -------------------------------------------------------------------------
 
-	public static class Accessor extends SLAnimator.JComponentAccessor {
+	public static class Accessor extends SLAnimator.ComponentAccessor {
 		public static final int BORDER_THICKNESS = 100;
 
 		@Override
-		public int getValues(JComponent target, int tweenType, float[] returnValues) {
+		public int getValues(Component target, int tweenType, float[] returnValues) {
 			ThePanel tp = (ThePanel) target;
 
 			int ret = super.getValues(target, tweenType, returnValues);
@@ -143,7 +143,7 @@ public class ThePanel extends JPanel {
 		}
 
 		@Override
-		public void setValues(JComponent target, int tweenType, float[] newValues) {
+		public void setValues(Component target, int tweenType, float[] newValues) {
 			ThePanel tp = (ThePanel) target;
 
 			super.setValues(target, tweenType, newValues);

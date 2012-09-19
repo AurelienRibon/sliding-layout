@@ -137,6 +137,7 @@ public class SLKeyframe {
 				cmpsToAddAfterTransition.add(c);
 				Tile t = cfg.getTile(c);
 				c.setBounds(t.x, t.y, t.w, t.h);
+				c.validate();
 			}
 		}
 
@@ -170,10 +171,8 @@ public class SLKeyframe {
 		for (Component c : startTiles.keySet()) {
 			Tile t = startTiles.get(c);
 			c.setBounds(t.x, t.y, t.w, t.h);
+			c.validate();
 		}
-
-		// Since some components may have been removed, the panel is repaint.
-		cfg.getPanel().repaint();
 	}
 
 	Set<Component> getCmps() {
