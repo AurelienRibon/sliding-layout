@@ -28,8 +28,8 @@ public class SLKeyframe {
 	private final List<Component> cmpsToAddAfterTransition = new ArrayList<Component>();
 	private final List<Component> cmpsToRemoveAfterTransition = new ArrayList<Component>();
 	private Callback callback;
-	private SLSide startSideForAll = null;
-	private SLSide endSideForAll = null;
+	private SLSide sideForNewCmps = null;
+	private SLSide sideForOldCmps = null;
 
 	/**
 	 * The duration parameter controls the duration of the transition of a
@@ -73,8 +73,8 @@ public class SLKeyframe {
 	 * slide from. A new component is a component that is present in this
 	 * layout configuration but not on the previous one.
 	 */
-	public SLKeyframe setStartSideForAll(SLSide side) {
-		startSideForAll = side;
+	public SLKeyframe setStartSideForNewCmps(SLSide side) {
+		sideForNewCmps = side;
 		return this;
 	}
 
@@ -93,8 +93,8 @@ public class SLKeyframe {
 	 * slide to. An old component is a component that is not present in this
 	 * layout configuration but was on the previous one.
 	 */
-	public SLKeyframe setEndSideForAll(SLSide side) {
-		endSideForAll = side;
+	public SLKeyframe setEndSideForOldCmps(SLSide side) {
+		sideForOldCmps = side;
 		return this;
 	}
 
@@ -196,20 +196,20 @@ public class SLKeyframe {
 		oldCmps.addAll(prevKf.cfg.getCmps());
 		oldCmps.removeAll(cfg.getCmps());
 
-		// If a "startSideForAll" is defined, every new component without an
+		// If a "sideForNewCmps" is defined, every new component without an
 		// assigned start side is put into the list of this side.
-		if (startSideForAll != null) {
+		if (sideForNewCmps != null) {
 			for (Component c : newCmps)
 				if (!isPartOf(c, cmpsWithStartSide))
-					cmpsWithStartSide.get(startSideForAll).add(c);
+					cmpsWithStartSide.get(sideForNewCmps).add(c);
 		}
 
-		// If an "endSideForAll" is defined, every old component without an
+		// If a "sideForOldCmps" is defined, every old component without an
 		// assigned end side is put into the list of this side.
-		if (endSideForAll != null) {
+		if (sideForOldCmps != null) {
 			for (Component c : oldCmps)
 				if (!isPartOf(c, cmpsWithEndSide))
-					cmpsWithEndSide.get(endSideForAll).add(c);
+					cmpsWithEndSide.get(sideForOldCmps).add(c);
 		}
 
 		// If new components have a start side, they are added to the panel and
