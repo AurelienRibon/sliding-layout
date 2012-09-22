@@ -48,6 +48,7 @@ import javax.swing.JLayeredPane;
 public class SLPanel extends JLayeredPane {
 	private TweenManager tweenManager;
 	SLConfig currentCfg;
+	boolean isTransitionPlaying = false;
 
 	public SLPanel() {
 		addComponentListener(new ComponentAdapter() {

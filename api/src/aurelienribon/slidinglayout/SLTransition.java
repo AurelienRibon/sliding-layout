@@ -57,12 +57,18 @@ public class SLTransition {
 	}
 
 	/**
-	 * Starts the transition.
+	 * Attempts to start the transition. Returns true if everything went right.
+	 * If another transition was already running, nothing happens and the
+	 * method returns false;
 	 */
-	public SLTransition play() {
-		currentKeyframe = 0;
-		play(keyframes.get(0), new SLKeyframe(panel.currentCfg, 0));
-		return this;
+	public boolean play() {
+		if (!panel.isTransitionPlaying) {
+			currentKeyframe = 0;
+			play(keyframes.get(0), new SLKeyframe(panel.currentCfg, 0));
+			panel.isTransitionPlaying = true;
+			return true;
+		}
+		return false;
 	}
 
 	// -------------------------------------------------------------------------
@@ -124,6 +130,8 @@ public class SLTransition {
 				if (currentKeyframe < keyframes.size()-1) {
 					currentKeyframe++;
 					play(keyframes.get(currentKeyframe), keyframes.get(currentKeyframe-1));
+				} else {
+					panel.isTransitionPlaying = false;
 				}
 			}
 		});

@@ -28,6 +28,8 @@ public class SLKeyframe {
 	private final List<Component> cmpsToAddAfterTransition = new ArrayList<Component>();
 	private final List<Component> cmpsToRemoveAfterTransition = new ArrayList<Component>();
 	private Callback callback;
+	private SLSide startSideForAll = null;
+	private SLSide endSideForAll = null;
 
 	/**
 	 * The duration parameter controls the duration of the transition of a
@@ -67,6 +69,16 @@ public class SLKeyframe {
 	}
 
 	/**
+	 * Sets the side of the screen from where every new component will
+	 * slide from. A new component is a component that is present in this
+	 * layout configuration but not on the previous one.
+	 */
+	public SLKeyframe setStartSideForAll(SLSide side) {
+		startSideForAll = side;
+		return this;
+	}
+
+	/**
 	 * Sets the side of the screen from where the given old components will
 	 * slide to. An old component is a component that is not present in this
 	 * layout configuration but was on the previous one.
@@ -77,8 +89,18 @@ public class SLKeyframe {
 	}
 
 	/**
+	 * Sets the side of the screen from where every old component will
+	 * slide to. An old component is a component that is not present in this
+	 * layout configuration but was on the previous one.
+	 */
+	public SLKeyframe setEndSideForAll(SLSide side) {
+		endSideForAll = side;
+		return this;
+	}
+
+	/**
 	 * Sets the delay used by the given components before the transition from
-	 * their current place to their target one will fire.
+	 * their current place to their target one starts.
 	 */
 	public SLKeyframe setDelay(float delay, Component... cmps) {
 		for (Component c : cmps) delays.put(c, delay);
@@ -87,12 +109,32 @@ public class SLKeyframe {
 
 	/**
 	 * Sets the delay used by the given components before the transition from
-	 * their current place to their target one will fire. The delay is
+	 * their current place to their target one starts. The delay is
 	 * increased for each component in the list.
 	 */
 	public SLKeyframe setDelayIncr(float delay, Component... cmps) {
 		float d = 0;
 		for (Component c : cmps) delays.put(c, d += delay);
+		return this;
+	}
+
+	/**
+	 * Increases the delay used by the given components before the transition
+	 * from their current place to their target one starts.
+	 */
+	public SLKeyframe addDelay(float delay, Component... cmps) {
+		for (Component c : cmps) delays.put(c, delays.get(c) + delay);
+		return this;
+	}
+
+	/**
+	 * Increases the delay used by the given components before the transition
+	 * from their current place to their target one starts. The delay is
+	 * increased for each component in the list.
+	 */
+	public SLKeyframe addDelayIncr(float delay, Component... cmps) {
+		float d = 0;
+		for (Component c : cmps) delays.put(c, delays.get(c) + (d += delay));
 		return this;
 	}
 
@@ -105,10 +147,34 @@ public class SLKeyframe {
 		return this;
 	}
 
+	/**
+	 * Gets the delay associated to the given component.
+	 */
+	public float getDelay(Component cmp) {
+		return delays.containsKey(cmp) ? delays.get(cmp) : 0;
+	}
+
+	/**
+	 * Gets the callback associated with this keyframe, if any.
+	 */
+	public Callback getCallback() {
+		return callback;
+	}
+
+	/**
+	 * Gets the duration of the transition to this keyframe.
+	 */
+	public float getDuration() {
+		return duration;
+	}
+
 	// -------------------------------------------------------------------------
 	// Package API
 	// -------------------------------------------------------------------------
 
+	/**
+	 * TODO: cut that into smaller chunks
+	 */
 	void initialize(SLKeyframe prevKf) {
 		cfg.placeAndRoute();
 
@@ -120,12 +186,33 @@ public class SLKeyframe {
 			targetTiles.put(c, cfg.getTile(c).clone());
 		}
 
-		// New components are searched
+		// New components are identified
 		List<Component> newCmps = new ArrayList<Component>();
 		newCmps.addAll(cfg.getCmps());
 		newCmps.removeAll(prevKf.cfg.getCmps());
 
-		// If they have a start side, they are added to the panel and
+		// Old components are identified
+		List<Component> oldCmps = new ArrayList<Component>();
+		oldCmps.addAll(prevKf.cfg.getCmps());
+		oldCmps.removeAll(cfg.getCmps());
+
+		// If a "startSideForAll" is defined, every new component without an
+		// assigned start side is put into the list of this side.
+		if (startSideForAll != null) {
+			for (Component c : newCmps)
+				if (!isPartOf(c, cmpsWithStartSide))
+					cmpsWithStartSide.get(startSideForAll).add(c);
+		}
+
+		// If an "endSideForAll" is defined, every old component without an
+		// assigned end side is put into the list of this side.
+		if (endSideForAll != null) {
+			for (Component c : oldCmps)
+				if (!isPartOf(c, cmpsWithEndSide))
+					cmpsWithEndSide.get(endSideForAll).add(c);
+		}
+
+		// If new components have a start side, they are added to the panel and
 		// their location will be computed later. Else, they are directly
 		// placed at their target position, and will be added to the panel
 		// at the end of the transition.
@@ -141,14 +228,9 @@ public class SLKeyframe {
 			}
 		}
 
-		// Old components are searched
-		List<Component> oldCmps = new ArrayList<Component>();
-		oldCmps.addAll(prevKf.cfg.getCmps());
-		oldCmps.removeAll(cfg.getCmps());
-
-		// If they have an end side, their target location will be computed
-		// later, and they will be removed at the end of the transition. Else,
-		// they are directly removed from the panel.
+		// If old components have an end side, their target location will be
+		// computed later, and they will be removed at the end of the
+		//transition. Else, they are directly removed from the panel.
 		for (Component c : oldCmps) {
 			if (isPartOf(c, cmpsWithEndSide)) {
 				cmpsToRemoveAfterTransition.add(c);
@@ -157,7 +239,6 @@ public class SLKeyframe {
 				cfg.getPanel().remove(c);
 			}
 		}
-
 
 		// Start/target locations are computed for new/old components
 		// that have a start/end side set.
@@ -189,18 +270,6 @@ public class SLKeyframe {
 
 	Tile getTarget(Component cmp) {
 		return targetTiles.get(cmp);
-	}
-
-	float getDelay(Component cmp) {
-		return delays.containsKey(cmp) ? delays.get(cmp) : 0;
-	}
-
-	Callback getCallback() {
-		return callback;
-	}
-
-	float getDuration() {
-		return duration;
 	}
 
 	SLConfig getCfg() {
