@@ -75,13 +75,17 @@ public class SLPanel extends JLayeredPane {
 	 */
 	public void initialize(SLConfig cfg) {
 		currentCfg = cfg;
-		cfg.placeAndRoute();
 
-		removeAll();
-		for (Component c : cfg.getCmps()) {
-			SLConfig.Tile t = cfg.getTile(c);
-			c.setBounds(t.x, t.y, t.w, t.h);
-			add(c, new Integer(1));
+		if (getWidth() != 0 || getHeight() != 0) {
+			cfg.placeAndRoute();
+
+			removeAll();
+			for (Component c : cfg.getCmps()) {
+				SLConfig.Tile t = cfg.getTile(c);
+				c.setBounds(t.x, t.y, t.w, t.h);
+				c.validate();
+				add(c, new Integer(1));
+			}
 		}
 	}
 
