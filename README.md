@@ -49,6 +49,10 @@ SLConfig config2 = ... ;
 
 panel.initialize(config1);
 
+// Start the animation thread
+
+SLAnimator.start();
+
 // Now, whenever you want, you can fire a transition
 
 panel.createTimeline()
